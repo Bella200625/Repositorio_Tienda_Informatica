@@ -1,4 +1,4 @@
-package model.newpackage;
+package model;
 
 public class Producto {
     private int idProducto; //PK

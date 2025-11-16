@@ -2,7 +2,7 @@ package ports;
 
 import java.util.List;
 
-import model.newpackage.Producto;
+import model.Producto;
 
 public interface ProductoRepositoryPort {
 

@@ -1,13 +1,13 @@
-package model.newpackage;
+package model;
 
-public class CategoriaAlquilable {
+public class CategoriaServicioTecnico {
 
     private int categoriaProductoIdcategoria; // PK/FK
 
-    public CategoriaAlquilable() {
+    public CategoriaServicioTecnico() {
     }
 
-    public CategoriaAlquilable(int categoriaProductoIdcategoria) {
+    public CategoriaServicioTecnico(int categoriaProductoIdcategoria) {
         this.categoriaProductoIdcategoria = categoriaProductoIdcategoria;
     }
 
