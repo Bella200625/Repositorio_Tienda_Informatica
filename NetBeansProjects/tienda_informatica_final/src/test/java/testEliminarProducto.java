@@ -33,7 +33,7 @@ public class testEliminarProducto {
             System.out.println("✅ ELIMINACIÓN EXITOSA. Verificando... ");
 
 
-            //VERIFICACIÓN
+            //wwVERIFICACIÓN
 
             Producto productoPost = repository.buscarProductoPorId(ID_A_ELIMINAR);
             
