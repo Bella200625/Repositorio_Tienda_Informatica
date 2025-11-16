@@ -85,7 +85,6 @@ public class Producto {
 
     public void setDetalleAltaTecnologia(DetalleAltaTecnologia detalleAltaTecnologia) {
         this.detalleAltaTecnologia = detalleAltaTecnologia;
-        this.detalleAltaTecnologiaId = (detalleAltaTecnologia != null) ? detalleAltaTecnologia.getId() : null;
     }
 
 }

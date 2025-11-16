@@ -1,16 +1,16 @@
 package model.newpackage;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class DetalleAltaTecnologia {
-    private int idDetalleAltaTecnologia; //PK
+
+    private int idDetalleAltaTecnologia;
     private String paisOrigen;
     private LocalDate fechaFabricacion;
-    private int empresaFabricanteId; //FK
-
-    private EmpresaFabricante empresaFabricante;
+    private int empresaFabricanteId;
     
+    private EmpresaFabricante fabricante;
+
     public DetalleAltaTecnologia() {
     }
 
@@ -21,37 +21,44 @@ public class DetalleAltaTecnologia {
         this.empresaFabricanteId = empresaFabricanteId;
     }
 
-    //Getters y Setters
+    // Getters y Setters...
     public int getIdDetalleAltaTecnologia() {
         return idDetalleAltaTecnologia;
-    }
-
-    public String getPaisOrigen() {
-        return paisOrigen;
-    }
-
-    public LocalDate getFechaFabricacion() {
-        return fechaFabricacion;
-    }
-
-    public int getEmpresaFabricanteId() {
-        return empresaFabricanteId;
     }
 
     public void setIdDetalleAltaTecnologia(int idDetalleAltaTecnologia) {
         this.idDetalleAltaTecnologia = idDetalleAltaTecnologia;
     }
 
+    public String getPaisOrigen() {
+        return paisOrigen;
+    }
+
     public void setPaisOrigen(String paisOrigen) {
         this.paisOrigen = paisOrigen;
+    }
+
+    public LocalDate getFechaFabricacion() {
+        return fechaFabricacion;
     }
 
     public void setFechaFabricacion(LocalDate fechaFabricacion) {
         this.fechaFabricacion = fechaFabricacion;
     }
 
+    public int getEmpresaFabricanteId() {
+        return empresaFabricanteId;
+    }
+
     public void setEmpresaFabricanteId(int empresaFabricanteId) {
         this.empresaFabricanteId = empresaFabricanteId;
     }
+    
+    public EmpresaFabricante getFabricante() {
+        return fabricante;
+    }
 
+    public void setFabricante(EmpresaFabricante fabricante) {
+        this.fabricante = fabricante;
+    }
 }
