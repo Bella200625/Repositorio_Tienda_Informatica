@@ -1,9 +1,14 @@
  
 
-import model.newpackage.*;
+import model.DetalleAltaTecnologia;
+import model.EmpresaFabricante;
+import model.Producto;
+import model.*;
 import ports.ProductoRepositoryPort;
-import adapters.MySQLProductoRepositoryAdapter;
+
 import java.time.LocalDate;
+
+import adapters.MySQLProductoRepositoryAdapter;
 
 public class testProducto {
 
