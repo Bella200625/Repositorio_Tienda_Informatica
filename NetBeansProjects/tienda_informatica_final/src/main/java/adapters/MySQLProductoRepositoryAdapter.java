@@ -186,21 +186,81 @@ String sql = "SELECT " +
     return producto;
 }
     
-    // ...
+@Override
+public List<Producto> obtenerTodosLosProductos() {
+    List<Producto> productos = new java.util.ArrayList<>();
 
-    @Override
-    public List<Producto> obtenerTodosLosProductos() {
+    // La misma consulta SQL que en buscarProductoPorId, pero sin la cláusula WHERE
+    String sql = "SELECT " +
+                 "p.idProducto, p.nombre_producto, p.modelo, p.descripcion, " +
+                 "p.categoria_producto_idcategoria, p.Detalle_alta_tecnologia_idDetalle_alta_tecnologia, " +
+                 "cp.nombre AS nombre_categoria, " +
+                 "dat.idDetalle_alta_tecnologia, dat.pais_origen, dat.fecha_fabricacion, " +
+                 "ef.idEmpresa_fabricante, ef.nombre AS nombre_fabricante, ef.numero_empleados " +
+                 "FROM producto p " +
+                 "JOIN categoria_producto cp ON p.categoria_producto_idcategoria = cp.idcategoria " +
+                 "LEFT JOIN detalle_alta_tecnologia dat ON p.Detalle_alta_tecnologia_idDetalle_alta_tecnologia = dat.idDetalle_alta_tecnologia " +
+                 "LEFT JOIN empresa_fabricante ef ON dat.Empresa_fabricante_idEmpresa_fabricante = ef.idEmpresa_fabricante";
 
-            System.err.println("❌ ERROR FATAL AL OBTENER TODOS LOS PRODUCTOS: Método no implementado");
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerTodosLosProductos'");
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            
+            Producto producto = new Producto();
+            producto.setIdProducto(rs.getInt("idProducto"));
+            producto.setNombreProducto(rs.getString("nombre_producto"));
+            producto.setModelo(rs.getString("modelo"));
+            producto.setDescripcion(rs.getString("descripcion"));
+            
+            // Mapear Categoría
+            producto.setCategoriaProductoId(rs.getInt("categoria_producto_idcategoria"));
+            //Asume que tienes la clase CategoriaProducto
+            CategoriaProducto categoria = new CategoriaProducto(
+                producto.getCategoriaProductoId(), 
+                rs.getString("nombre_categoria")
+            );
+            producto.setCategoria(categoria);
+            
+            Integer detalleIdFK = (Integer) rs.getObject("Detalle_alta_tecnologia_idDetalle_alta_tecnologia");
+            producto.setDetalleAltaTecnologiaId(detalleIdFK);
+            
+            // Mapear DetalleAltaTecnologia y Fabricante
+            if (detalleIdFK != null) {
+                // Asume que tienes las clases EmpresaFabricante y DetalleAltaTecnologia
+                EmpresaFabricante fabricante = new EmpresaFabricante(
+                    rs.getInt("idEmpresa_fabricante"), 
+                    rs.getString("nombre_fabricante"), 
+                    rs.getInt("numero_empleados")
+                );
+                
+                DetalleAltaTecnologia detalle = new DetalleAltaTecnologia(
+                    rs.getInt("idDetalle_alta_tecnologia"), 
+                    rs.getString("pais_origen"), 
+                    rs.getDate("fecha_fabricacion").toLocalDate(),
+                    fabricante.getIdEmpresaFabricante()
+                );
+                
+                detalle.setFabricante(fabricante);
+                producto.setDetalleAltaTecnologia(detalle);
+            }
+            productos.add(producto);
+        }
+    } catch (SQLException e) {
+        System.err.println("❌ ERROR al listar productos: " + e.getMessage());
+        e.printStackTrace();
     }
+    return productos;
+}
+
 
     @Override
     public boolean actualizarProducto(Producto producto) {
         boolean exito = false;
         
         try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD)) {
-            conn.setAutoCommit(false); // 🚀 Iniciar Transacción
+            conn.setAutoCommit(false);
 
             DetalleAltaTecnologia detalle = producto.getDetalleAltaTecnologia();
             

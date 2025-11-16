@@ -39,8 +39,34 @@ public class ProductoService implements ProductoServicePort {
         return productoRepository.buscarProductoPorId(id);
     }
 
-    @Override
+
     public Producto obtenerProductoPorId(int id) {
         return productoRepository.buscarProductoPorId(id);
     }
+
+    // Archivo: ProductoService.java (Capa de Aplicación)
+
+// ... (imports y constructor) ...
+
+// Nuevo: Actualizar (U)
+
+public boolean actualizarProducto(Producto producto) {
+    // Aquí iría la lógica de negocio antes de actualizar (ej. logs, auditoría)
+    return productoRepository.actualizarProducto(producto);
+}
+
+// Nuevo: Eliminar (D)
+
+public boolean eliminarProducto(int id) {
+    // Aquí iría la lógica de negocio antes de eliminar (ej. verificar inventario)
+    return productoRepository.eliminarProducto(id);
+}
+
+// Nuevo: Listar Todos (R - Múltiple)
+
+public List<Producto> obtenerTodosLosProductos() {
+    return productoRepository.obtenerTodosLosProductos();
+}
+
+// ... (fin de la clase) ...
 }
