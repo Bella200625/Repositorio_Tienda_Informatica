@@ -11,32 +11,50 @@ package model;
 public class Proveedor {
     private int idProveedor;
     private String nif;
+    private String nombre;
     private Direccion direccion;
-    
-     public Proveedor(String nif, String nombreEmpresa, Direccion direccion) {
+
+    public Proveedor() {
+    }
+
+    public Proveedor(int idProveedor, String nif, String nombre, Direccion direccion) {
+        this.idProveedor = idProveedor;
         this.nif = nif;
+        this.nombre = nombre;
         this.direccion = direccion;
     }
-     
-     public int getIdProveedor() {
+
+    public int getIdProveedor() {
         return idProveedor;
     }
-     
+
+    public void setIdProveedor(int idProveedor) {
+        this.idProveedor = idProveedor;
+    }
+
     public String getNif() {
         return nif;
     }
 
-    public void setNif(String nif) {
-        this.nif = nif;
+    public String getNombre() {
+        return nombre;
     }
 
     public Direccion getDireccion() {
         return direccion;
     }
 
+    public void setNif(String nif) {
+        this.nif = nif;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public void setDireccion(Direccion direccion) {
         this.direccion = direccion;
     }
-    
-    
+
+
 }

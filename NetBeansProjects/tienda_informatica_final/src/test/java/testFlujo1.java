@@ -82,8 +82,8 @@ public class testFlujo1 {
             return 0;
         }
     }
-    
-    // 1. AGREGAR PRODUCTO (C - Interactivo)
+
+    // AGREGAR PRODUCTO
 
     private static void agregarProducto(Scanner scanner, ProductoServicePort servicio) {
         System.out.println("\n--- REGISTRO DE NUEVO PRODUCTO ---");
@@ -164,7 +164,7 @@ public class testFlujo1 {
     }
     
 
-    // 2. CONSULTAR PRODUCTO POR ID (R)
+    // 2. CONSULTAR PRODUCTO POR ID
 
     private static void consultarProductoPorId(Scanner scanner, ProductoServicePort servicio) {
         System.out.print("Ingrese el ID del producto a consultar: ");
@@ -191,9 +191,8 @@ public class testFlujo1 {
         }
     }
 
-    // ==============================================================
-    // 3. ACTUALIZAR PRODUCTO (U)
-    // ==============================================================
+    //ACTUALIZAR PRODUCTO
+
     private static void actualizarProducto(Scanner scanner, ProductoServicePort servicio) {
         System.out.print("Ingrese el ID del producto a actualizar: ");
         int id = scanner.nextInt();
@@ -232,10 +231,10 @@ public class testFlujo1 {
     }
 
 
-    // 4. LISTAR TODOS LOS PRODUCTOS (R - Múltiple)
+    //LISTAR TODOS LOS PRODUCTOS
     private static void listarTodosLosProductos(ProductoServicePort servicio) {
         System.out.println("\n--- LISTADO COMPLETO DE PRODUCTOS ---");
-        
+
 
         List<Producto> productos = servicio.obtenerTodosLosProductos();
 
@@ -253,9 +252,8 @@ public class testFlujo1 {
                                p.getIdProducto(), p.getNombreProducto(), p.getModelo(), categoria, altaTec);
         }
     }
-    
 
-    // 5. ELIMINAR PRODUCTO (D)
+    //ELIMINAR PRODUCTO
     private static void eliminarProducto(Scanner scanner, ProductoServicePort servicio) {
         System.out.print("Ingrese el ID del producto a eliminar: ");
         int id = scanner.nextInt();

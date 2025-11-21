@@ -60,6 +60,10 @@ public class Direccion {
     public void setBarrio(String barrio) {
         this.barrio = barrio;
     }
+
+    public void setIdDireccion(int idDireccion) {
+        this.idDireccion = idDireccion;
+    }
 }
     
     
