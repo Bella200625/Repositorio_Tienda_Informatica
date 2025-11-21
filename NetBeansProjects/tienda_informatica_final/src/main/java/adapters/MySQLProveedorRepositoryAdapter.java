@@ -1,18 +1,15 @@
 package adapters;
 
 import ports.ProveedorRepositoryPort;
-import model.Proveedor; // Usamos 'model.Proveedor'
-import model.Direccion; // Usamos 'model.Direccion'
+import model.Proveedor;
+import model.Direccion;
 import java.sql.*;
 import java.util.List;
 
-/**
- * Adaptador de Infraestructura para Proveedores.
- * Implementa el Puerto ProveedorRepositoryPort usando JDBC para MySQL.
- */
+
 public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort {
 
-    // ⚠️ Reemplaza con tus datos de conexión si son diferentes
+
     private static final String JDBC_URL = "jdbc:mysql://25.50.109.111:3306/tienda_informatica_final?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root2";
     private static final String PASSWORD = "";
@@ -25,11 +22,11 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
 
         try {
             conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-            conn.setAutoCommit(false); // 🚀 INICIAR TRANSACCIÓN
+            conn.setAutoCommit(false);
 
-            // -------------------------------------------------------------------
-            // PASO 1: INSERTAR DIRECCION Y OBTENER ID
-            // -------------------------------------------------------------------
+
+            //INSERTAR DIRECCION Y OBTENER ID
+
             String sqlInsertDireccion = "INSERT INTO direccion (pais, ciudad, calle, barrio) VALUES (?, ?, ?, ?)";
             
             try (PreparedStatement psDir = conn.prepareStatement(sqlInsertDireccion, Statement.RETURN_GENERATED_KEYS)) {
@@ -50,16 +47,15 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
                 }
             }
             
-            // -------------------------------------------------------------------
-            // PASO 2: INSERTAR PROVEEDOR USANDO EL ID DE DIRECCION
-            // -------------------------------------------------------------------
-            // Asumiendo que la FK se llama 'Direccion_idDireccion'
+
+            //INSERTAR PROVEEDOR USANDO EL ID DE DIRECCION
+
             String sqlInsertProveedor = "INSERT INTO proveedor (nif, nombre, Direccion_idDireccion) VALUES (?, ?, ?)";
 
             try (PreparedStatement psProv = conn.prepareStatement(sqlInsertProveedor, Statement.RETURN_GENERATED_KEYS)) {
                 psProv.setString(1, proveedor.getNif());
                 psProv.setString(2, proveedor.getNombre());
-                psProv.setInt(3, direccion.getIdDireccion()); // Usar el ID generado
+                psProv.setInt(3, direccion.getIdDireccion());
 
                 if (psProv.executeUpdate() > 0) {
                     try (ResultSet rsProv = psProv.getGeneratedKeys()) {
@@ -73,14 +69,14 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
                 }
             }
 
-            conn.commit(); // ✅ CONFIRMAR LA TRANSACCIÓN
+            conn.commit();
             System.out.println("LOG: Proveedor " + proveedor.getNombre() + " registrado con ID: " + idGenerado);
 
         } catch (SQLException e) {
-            System.err.println("❌ ERROR FATAL AL GUARDAR PROVEEDOR (ROLLBACK): " + e.getMessage());
+            System.err.println("ERROR FATAL AL GUARDAR PROVEEDOR (ROLLBACK): " + e.getMessage());
             if (conn != null) {
                 try {
-                    conn.rollback(); // ↩️ REVERTIR LA TRANSACCIÓN
+                    conn.rollback();
                 } catch (SQLException ex) {
                     System.err.println("Error en rollback: " + ex.getMessage());
                 }
@@ -101,9 +97,47 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
 
     @Override
     public Proveedor buscarProveedorPorId(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'buscarProveedorPorId'");
+    Proveedor proveedor = null;
+
+    // Consulta usando JOIN para traer Proveedor y su Direccion
+    String sql = "SELECT p.idProveedor, p.nif, p.nombre, p.Direccion_idDireccion, " +
+                 "d.idDireccion, d.pais, d.ciudad, d.calle, d.barrio " +
+                 "FROM proveedor p " +
+                 "JOIN direccion d ON p.Direccion_idDireccion = d.idDireccion " +
+                 "WHERE p.idProveedor = ?";
+
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                //Crear el objeto Direccion
+                Direccion direccion = new Direccion(
+                    rs.getString("pais"), 
+                    rs.getString("ciudad"), 
+                    rs.getString("calle"), 
+                    rs.getString("barrio")
+                );
+
+                direccion.setIdDireccion(rs.getInt("idDireccion")); 
+
+                //Crear el objeto Proveedor, agregando la Direccion
+                proveedor = new Proveedor(
+                    rs.getInt("idProveedor"), 
+                    rs.getString("nif"),
+                    rs.getString("nombre"), 
+                    direccion
+                );
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("ERROR al buscar proveedor por ID: " + e.getMessage());
+        e.printStackTrace();
     }
+    return proveedor;
+}
 
     @Override
     public List<Proveedor> obtenerTodosLosProveedores() {
@@ -123,5 +157,5 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
         throw new UnsupportedOperationException("Unimplemented method 'eliminarProveedor'");
     }
 
-    // ... (El resto de métodos pendientes del CRUD) ...
+
 }
