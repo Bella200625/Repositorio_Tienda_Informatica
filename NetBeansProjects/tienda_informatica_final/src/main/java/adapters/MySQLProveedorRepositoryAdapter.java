@@ -4,6 +4,7 @@ import ports.ProveedorRepositoryPort;
 import model.Proveedor;
 import model.Direccion;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -139,11 +140,45 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
     return proveedor;
 }
 
-    @Override
-    public List<Proveedor> obtenerTodosLosProveedores() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'obtenerTodosLosProveedores'");
+public List<Proveedor> obtenerTodosLosProveedores() {
+    List<Proveedor> proveedores = new ArrayList<>();
+
+    // Consulta usando JOIN para traer Proveedor y su Direccion
+    String sql = "SELECT p.idProveedor, p.nif, p.nombre, p.Direccion_idDireccion, " +
+                 "d.idDireccion, d.pais, d.ciudad, d.calle, d.barrio " +
+                 "FROM proveedor p " +
+                 "JOIN direccion d ON p.Direccion_idDireccion = d.idDireccion";
+
+    //
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            //Crear el objeto Direccion
+            Direccion direccion = new Direccion(
+                rs.getString("pais"), 
+                rs.getString("ciudad"), 
+                rs.getString("calle"), 
+                rs.getString("barrio")
+            );
+            direccion.setIdDireccion(rs.getInt("idDireccion")); 
+
+            //Crear el objeto Proveedor, anidando la Direccion
+            Proveedor proveedor = new Proveedor(
+                rs.getInt("idProveedor"), 
+                rs.getString("nif"),
+                rs.getString("nombre"),
+                direccion
+            );
+            proveedores.add(proveedor);
+        }
+    } catch (SQLException e) {
+        System.err.println("ERROR al listar proveedores: " + e.getMessage());
+        e.printStackTrace();
     }
+    return proveedores;
+}
 
     @Override
     public boolean actualizarProveedor(Proveedor proveedor) {
