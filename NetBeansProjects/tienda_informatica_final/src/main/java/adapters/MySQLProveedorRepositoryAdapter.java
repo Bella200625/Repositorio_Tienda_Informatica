@@ -147,15 +147,116 @@ public class MySQLProveedorRepositoryAdapter implements ProveedorRepositoryPort 
 
     @Override
     public boolean actualizarProveedor(Proveedor proveedor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actualizarProveedor'");
+    Connection conn = null;
+    boolean exito = false;
+
+    try {
+        conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        conn.setAutoCommit(false);
+
+
+        //ACTUALIZAR DIRECCION
+
+        Direccion direccion = proveedor.getDireccion();
+        String sqlUpdateDireccion = "UPDATE direccion SET pais = ?, ciudad = ?, calle = ?, barrio = ? WHERE idDireccion = ?";
+        
+        try (PreparedStatement psDir = conn.prepareStatement(sqlUpdateDireccion)) {
+            psDir.setString(1, direccion.getPais());
+            psDir.setString(2, direccion.getCiudad());
+            psDir.setString(3, direccion.getCalle());
+            psDir.setString(4, direccion.getBarrio());
+            psDir.setInt(5, direccion.getIdDireccion());
+            psDir.executeUpdate();
+        }
+        
+
+        //ACTUALIZAR PROVEEDOR
+
+        String sqlUpdateProveedor = "UPDATE proveedor SET nif = ?, nombre = ? WHERE idProveedor = ?";
+
+        try (PreparedStatement psProv = conn.prepareStatement(sqlUpdateProveedor)) {
+            psProv.setString(1, proveedor.getNif());
+            psProv.setString(2, proveedor.getNombre());
+            psProv.setInt(3, proveedor.getIdProveedor()); 
+
+            if (psProv.executeUpdate() > 0) {
+                exito = true;
+            }
+        }
+
+        if (exito) {
+            conn.commit();
+        } else {
+            conn.rollback();
+        }
+
+    } catch (SQLException e) {
+        System.err.println("ERROR FATAL AL ACTUALIZAR PROVEEDOR (ROLLBACK): " + e.getMessage());
+        if (conn != null) {
+            try { conn.rollback(); } catch (SQLException ex) {}
+        }
+        e.printStackTrace();
+    } finally {
+        if (conn != null) {
+            try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+        }
     }
+    return exito;
+}
 
     @Override
     public boolean eliminarProveedor(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarProveedor'");
+    //Buscar el proveedor para obtener el ID de la dirección
+    Proveedor proveedorAEliminar = buscarProveedorPorId(id); 
+    if (proveedorAEliminar == null) {
+        return true;
     }
+    final int idDireccion = proveedorAEliminar.getDireccion().getIdDireccion();
+    
+    Connection conn = null;
+    boolean exito = false;
+
+    try {
+        conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        conn.setAutoCommit(false);
+
+
+        //ELIMINAR PROVEEDOR
+        String sqlDeleteProveedor = "DELETE FROM proveedor WHERE idProveedor = ?";
+        try (PreparedStatement psProv = conn.prepareStatement(sqlDeleteProveedor)) {
+            psProv.setInt(1, id);
+            psProv.executeUpdate();
+        }
+        
+
+        //ELIMINAR DIRECCION
+        String sqlDeleteDireccion = "DELETE FROM direccion WHERE idDireccion = ?";
+        try (PreparedStatement psDir = conn.prepareStatement(sqlDeleteDireccion)) {
+            psDir.setInt(1, idDireccion);
+            if (psDir.executeUpdate() > 0) {
+                exito = true;
+            }
+        }
+        
+        if (exito) {
+            conn.commit();
+        } else {
+            conn.rollback();
+        }
+
+    } catch (SQLException e) {
+        System.err.println("ERROR FATAL AL ELIMINAR PROVEEDOR (ROLLBACK): " + e.getMessage());
+        if (conn != null) {
+            try { conn.rollback(); } catch (SQLException ex) {}
+        }
+        e.printStackTrace();
+    } finally {
+        if (conn != null) {
+            try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) {}
+        }
+    }
+    return exito;
+}
 
 
 }
